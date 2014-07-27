@@ -1,7 +1,3 @@
-##
-run_analysis <- function()
-  
-{
 if (grep("UCI HAR Dataset", getwd(), fixed=T)==FALSE) {
     setwd("./UCI HAR Dataset/") } else
 
@@ -39,15 +35,16 @@ std_columns <- grep("std()", names(X_test))
 sHAR <- HAR[c(563, 564, std_columns, mean_columns)]
 
 # setting human-readable names for Activity
-labs <- read.fwf("activity_labels.txt",c(1,50))
+labs <- read.fwf("activity_labels.txt",c(2,50))
 sHAR$Activity <- factor(sHAR$Activity, 1:6, labs$V2)
 
-# now let us melt the data and reshape it
+# now let us melt the data and reshape it. as in readme I stated 
+# we need to have reshape package installed, now we only load it
 # we choose Subject and Activity as ids, and all columns from 3rd to 68th as measurements
+library(reshape2)
 mHAR <- melt(sHAR, id.vars=c("Subject","Activity"), measure.vars=names(sHAR)[3:68])
 
 # and use dcast afterwards, that gives us the average 
 # of each variable for each activity and each subject.
 result <- dcast(mHAR, Subject + Activity ~ variable,mean)
-write.table(result, "tidy.csv", row.names=F)
-}
+write.table(result, "tidy.txt", row.names=F)
